@@ -9,6 +9,7 @@ class Dashboard extends React.Component {
 			expenses: []
 		}
 	}
+	
 	componentDidMount() {
 		Api.get("get-expenses")
 			.then(res => {
@@ -20,12 +21,21 @@ class Dashboard extends React.Component {
 			});
 	}
 	
+	logout = () => {
+		Api.post('/do-logout', {}).then(res => {
+			if(res.     status === 200){
+				localStorage.clear();
+				window.location.href = '/';
+			}
+		});
+	}
+	
 	render() {
 		return (
 			<div className="flex flex-col h-screen bg-gray-100">
 				<div className="bg-white p-4 flex justify-between items-center shadow-md">
 					<button className="text-blue-800 font-semibold">Code Guru Assessment</button>
-					<button className="text-red-600 font-semibold">Logout</button>
+					<button className="text-red-600 font-semibold" onClick={this.logout}>Logout</button>
 				</div>
 				
 				<div className="flex flex-1">

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ExpenseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,8 +24,9 @@ Route::middleware('auth:api')->group( function () {
     Route::post('/send-email-verification', [AuthController::class, 'reSendVerificationEmail'])
         ->middleware('throttle:1,1');
     Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
+    Route::post('/do-logout', [AuthController::class, 'logout']);
 
     Route::group(['middleware' => 'verified-user'], function () {
-        Route::post('/get-expenses', [AuthController::class, 'getExpenses']);
+        Route::get('/get-expenses', [ExpenseController::class, 'getExpenses']);
     });
 });

@@ -71,6 +71,16 @@ class AuthController extends Controller
     }
 
     /**
+     * logout
+     * @return JsonResponse
+     */
+    public function logout(): JsonResponse
+    {
+        Auth::logout();
+        return response()->json(['message' => 'Logged out successfully']);
+    }
+
+    /**
      * @return JsonResponse
      */
     public function reSendVerificationEmail(): JsonResponse
