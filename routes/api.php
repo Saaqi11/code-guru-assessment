@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::post("login", [AuthController::class, 'doLogin']);
+Route::post("signup", [AuthController::class, 'doSignUp']);
+
+
+Route::middleware('auth:api')->group( function () {
+    Route::post('/send-email-verification', [AuthController::class, 'reSendVerificationEmail'])
+        ->middleware('throttle:1,1');
+    Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
+
+    Route::group(['middleware' => 'verified-user'], function () {
+
+    });
 });

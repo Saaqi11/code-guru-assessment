@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "@/src/Pages/Auth/Login";
 import SignUp from "@/src/Pages/Auth/SignUp";
+import OtpVerification from "@/src/Pages/Auth/OtpVerification";
 
 
 class AppRoutes extends React.Component{
@@ -12,7 +13,7 @@ class AppRoutes extends React.Component{
 					<Routes>
 						<Route path={`/`}  element={<Login />} />
 						<Route path={`/signup`}  element={<SignUp />} />
-						{/*<Route path={`${process.env.APP_URL}/profile`} exact element={<Profile />}/>*/}
+						<Route path={`/otp-verify`}  element={<OtpVerification />} />
 					</Routes>
 				</div>
 			</BrowserRouter>

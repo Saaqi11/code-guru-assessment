@@ -9,20 +9,21 @@ export default function Login() {
 	const [errorMessage, setErrorMessage] = useState('');
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		try {
-			await Api.post('/login',
-				{ email, password }
-			).then(res => {
-				if (res.status === 200) {
-					setIsAuthenticate(true);
-					localStorage.setItem('authToken', res['authToken'])
-					localStorage.setItem('user', JSON.stringify(res['user']))
-				}
-			});
-		} catch (error) {
-			if (error.response) {
-				const status = error.response.status;
-				
+		if (password === "" || email === "") {
+			setErrorMessage('Please fill all fields.');
+			return;
+		}
+		Api.post('/login',
+			{ email, password }
+		).then(res => {
+			if (res.status === 200) {
+				setIsAuthenticate(true);
+				localStorage.setItem('authToken', res['data']['authToken'])
+				localStorage.setItem('user', JSON.stringify(res['data']['user']))
+			}
+		}).catch(error => {
+			if (error) {
+				const status = error.status;
 				if (status === 401) {
 					setErrorMessage('Invalid credentials. Please try again.');
 				} else {
@@ -31,8 +32,7 @@ export default function Login() {
 			} else {
 				setErrorMessage('Network error. Please check your connection.');
 			}
-			console.error('Authentication error:', error);
-		}
+		});
 	};
 	if (!isAuthenticate) {
 		return(
@@ -63,7 +63,7 @@ export default function Login() {
 						<button className="w-full bg-blue-500 text-white p-2 rounded" type="submit">Login</button>
 					</form>
 					<p className="mt-4 text-center">
-						For sign up? <Link to="/signup" className="text-blue-500"> </Link>
+						For sign up? <Link to="/signup" className="text-blue-500"> Sign Up</Link>
 					</p>
 				</div>
 			</div>
