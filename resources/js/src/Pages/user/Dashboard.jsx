@@ -1,25 +1,37 @@
 import React from 'react';
 import Api from "@/src/Api.jsx";
+import ExpenseListing from "@/src/Pages/user/expense/ExpenseListing.jsx";
 
 
 class Dashboard extends React.Component {
 	constructor() {
 		super();
 		this.state = {
-			expenses: []
+			data: [],
+			loading: true,
+			searchText: '',
 		}
 	}
 	
 	componentDidMount() {
+		this.fetchData();
+	}
+	
+	fetchData = () => {
 		Api.get("get-expenses")
 			.then(res => {
 				if(res.status === 200){
 					this.setState({
-						expenses: res.data.result.expenses
+						data: res.data.result,
+						loading: false,
 					});
 				}
 			});
 	}
+	
+	handleSearch = (e) => {
+		this.setState({ searchText: e.target.value });
+	};
 	
 	logout = () => {
 		Api.post('/do-logout', {}).then(res => {
@@ -52,6 +64,15 @@ class Dashboard extends React.Component {
 					<div className="flex-1 p-8">
 						<div className="bg-white rounded-lg shadow-md p-6">
 							Welcome to your dashboard!
+						</div>
+						<br/>
+						<div className="bg-white rounded-lg shadow-md p-6">
+							{this.state.data ?
+								<ExpenseListing
+									expenses={this.state}
+								/>
+								: ""
+							}
 						</div>
 					</div>
 				</div>
