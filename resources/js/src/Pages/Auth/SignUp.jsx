@@ -4,31 +4,38 @@ import Api from "@/src/Api.jsx";
 
 export default function SignUp() {
 	const [email, setEmail] = useState('');
+	const [name, setName] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [errorMessage, setErrorMessage] = useState('');
 	const [isRegistered, setIsRegistered] = useState(false);
+	const [isRegistering, setIsRegistering] = useState(false);
 	const handleSignup = async (e) => {
 		e.preventDefault();
+		
 		if (password !== confirmPassword) {
 			setErrorMessage('Passwords do not match.');
 			return;
 		}
-		if (password === "" || email === "" ||confirmPassword) {
+		if (password === "" || email === "" || confirmPassword === "") {
 			setErrorMessage('Please fill all fields.');
 			return;
 		}
+		setIsRegistering(true);
 		await Api.post('/signup',
-			{ email, password }
+			{ name, email, password }
 		).then(res => {
 			if (res.status === 200) {
 				setIsRegistered(true);
+				setIsRegistering(false);
+				localStorage.setItem('token', res['data']['result']['token'])
+				localStorage.setItem('user', JSON.stringify(res['data']['result']['user']))
 			}
 		}).catch(error => {
 			if (error) {
 				const status = error.status;
 				if (status === 401) {
-					setErrorMessage(error.data.message);
+					setErrorMessage(error.data.result.message);
 				} else {
 					setErrorMessage('An error occurred. Please try again later.');
 				}
@@ -51,6 +58,13 @@ export default function SignUp() {
 						<input
 							className="w-full mb-4 p-2 border rounded"
 							type="text"
+							placeholder="Full Name"
+							value={name}
+							onChange={(e) => setName(e.target.value)}
+						/>
+						<input
+							className="w-full mb-4 p-2 border rounded"
+							type="email"
 							placeholder="Email"
 							value={email}
 							onChange={(e) => setEmail(e.target.value)}
@@ -69,7 +83,7 @@ export default function SignUp() {
 							value={confirmPassword}
 							onChange={(e) => setConfirmPassword(e.target.value)}
 						/>
-						<button className="w-full bg-blue-500 text-white p-2 rounded" type="submit">Sign Up</button>
+						<button className="w-full bg-blue-500 text-white p-2 rounded" type="submit">{isRegistering ? "Rgistering..." : "Sign up"}</button>
 					</form>
 					<p className="mt-4 text-center">
 						Already have an account? <Link to="/" className="text-blue-500">Log In</Link>

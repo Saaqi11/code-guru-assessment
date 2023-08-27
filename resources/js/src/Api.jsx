@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {Navigate} from "react-router-dom";
 
 const Api = axios.create({
    baseURL: '/api',
@@ -6,7 +7,7 @@ const Api = axios.create({
 });
 
 Api.interceptors.request.use(config => {
-    const token = localStorage.getItem('authToken'); // Retrieve token from storage
+    const token = localStorage.getItem('token'); // Retrieve token from storage
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -22,11 +23,14 @@ Api.interceptors.response.use(
        }
     },
     error => {
-       if (error.message.indexOf("401") !== -1) {
-          localStorage.clear();
-          window.location.href = '/';
-       }
-       return Promise.reject(error);
+        if (error.status === 419) {
+            return <Navigate to="/otp-verify" replace={true} />;
+        }
+        if (error.message.indexOf("401") !== -1) {
+           localStorage.clear();
+           window.location.href = '/';
+        }
+        return Promise.reject(error);
     }
 );
 

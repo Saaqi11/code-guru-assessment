@@ -20,7 +20,8 @@ class VerifiedUser
         if (!auth()->user()->email_verified_at) {
             return \response()->json([
                 'message' => "You are not authorised for this action",
-            ], 401);
+                'redirect' => 'otp'
+            ], 419);
         }
         return $next($request);
     }

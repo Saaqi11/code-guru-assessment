@@ -24,24 +24,27 @@ class AuthController extends Controller
         }
 
         $input = $request->all();
-        $input['code_expires_at'] = Carbon::now()->addHour();
+        $input['code'] = rand(1000,9999);
+        $input['password'] = bcrypt($input['password']);
+        $currentDateTime = Carbon::now();
+        $dateTimeInOneHour = $currentDateTime->copy()->addHour();
+        $input['code_expires_at'] = $dateTimeInOneHour->format('Y-m-d H:i:s');
 
         //create user
         $user = User::create($input);
-        $this->sendVerificationEmail($user);
+        $this->sendVerificationEmail($input);
         unset($user->code);
-        $success['token'] = $user->createToken('Pinzzit')->accessToken;
+        $success['token'] = $user->createToken('CodeGuru')->accessToken;
         $success['user'] = $user;
 
         return $this->sendResponse($success, 'Confirmation code has been sent to your email. Please verify your email.');
     }
 
     /**
+     * Send email with the template
      * @param $user
      */
     private function sendVerificationEmail($user) {
-        $user = json_decode(json_encode($user), true);
-        // send email with the template
         Mail::send('user-verification', $user, function ($message) use ($user) {
             $message->to($user['email'], $user['name'])
                 ->subject('Please Verify your Account')
@@ -53,7 +56,7 @@ class AuthController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function doUserLogin(Request $request): JsonResponse
+    public function doLogin(Request $request): JsonResponse
     {
         if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
             $user = Auth::user();
@@ -63,7 +66,7 @@ class AuthController extends Controller
             return $this->sendResponse($success, 'User login successfully.');
         }
         else{
-            return $this->sendError('Unauthorised.', ['error'=>'Unauthorised'], ResponseAlias::HTTP_NOT_FOUND);
+            return $this->sendError('Unauthorised.', ['error'=>'Unauthorised'], 401);
         }
     }
 
@@ -94,7 +97,7 @@ class AuthController extends Controller
             $user = User::where('email', Auth::user()->email)->first();
             if (!Auth::user()->email_verified_at) {
                 if ($user->code_expires_at > Carbon::now()){
-                    if ($user->code === $request->code) {
+                    if ($user->code === $request->otp) {
                         $user->email_verified_at = date('Y-m-d H:i:s');
                         $user->code = null;
                         $user->code_expires_at = null;

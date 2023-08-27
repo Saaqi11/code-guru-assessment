@@ -25,6 +25,6 @@ Route::middleware('auth:api')->group( function () {
     Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
 
     Route::group(['middleware' => 'verified-user'], function () {
-
+        Route::post('/get-expenses', [AuthController::class, 'getExpenses']);
     });
 });

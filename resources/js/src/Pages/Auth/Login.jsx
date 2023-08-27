@@ -18,8 +18,8 @@ export default function Login() {
 		).then(res => {
 			if (res.status === 200) {
 				setIsAuthenticate(true);
-				localStorage.setItem('authToken', res['data']['authToken'])
-				localStorage.setItem('user', JSON.stringify(res['data']['user']))
+				localStorage.setItem('token', res['data']['result']['token'])
+				localStorage.setItem('user', JSON.stringify(res['data']['result']['user']))
 			}
 		}).catch(error => {
 			if (error) {
